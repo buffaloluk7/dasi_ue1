@@ -4,73 +4,108 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import sun.misc.BASE64Encoder;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.UnsupportedEncodingException;
+import javax.swing.*;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 public class Controller {
-	@FXML private TextArea taPublicKey;
-	@FXML private TextArea taPrivateKey;
-	@FXML private TextArea taMessage;
-	@FXML private TextArea taResult;
-	@FXML private Button btnEncodeMessage;
-	@FXML private Button btnDecodeMessage;
+    @FXML private TextArea taPublicKey;
+    @FXML private TextArea taPrivateKey;
+    @FXML private TextArea taMessage;
+    @FXML private TextArea taResult;
+    @FXML private Button btnEncodeMessage;
+    @FXML private Button btnDecodeMessage;
 
-	RSA rsa = new RSA();
+    private RSA rsa = new RSA();
 
-	@FXML
-	protected void btnGenerateKeys(ActionEvent event) {
-		try {
-			rsa.initialize();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
+    public Controller() {
+        try {
+            rsa.initialize();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        }
+    }
 
-		KeyPair keys = rsa.getKeypair();
+    @FXML
+    protected void btnGenerateKeys(ActionEvent event) throws NoSuchPaddingException, NoSuchAlgorithmException {
+        rsa.initialize();
 
-		String publicKey = new BASE64Encoder().encode(keys.getPublic().getEncoded());
-		String privateKey = new BASE64Encoder().encode(keys.getPrivate().getEncoded());
+        String publicKey = Base64.getEncoder().encodeToString(rsa.getPublicKey().getEncoded());
+        String privateKey = Base64.getEncoder().encodeToString(rsa.getPrivateKey().getEncoded());
 
-		taPublicKey.setText(publicKey);
-		taPrivateKey.setText(privateKey);
+        taPublicKey.setText(publicKey);
+        taPrivateKey.setText(privateKey);
+    }
 
-		btnEncodeMessage.setDisable(false);
-		btnDecodeMessage.setDisable(false);
-	}
+    @FXML
+    protected void btnEncryptMessageAction(ActionEvent event) throws UnsupportedEncodingException, InvalidKeySpecException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
+        if (taMessage.getText().isEmpty() || taPublicKey.getText().isEmpty() || taMessage.getText().length() > 190) {
+            return;
+        }
 
-	@FXML
-	protected void btnEncodeMessageAction(ActionEvent event) {
-		try {
-			taResult.setText(rsa.encrypt(taMessage.getText()));
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		}
-	}
+        rsa.setPublicKey(taPublicKey.getText());
+        taResult.setText(rsa.encrypt(taMessage.getText()));
+    }
 
-	@FXML
-	protected void btnDecodeMessageAction(ActionEvent event) {
-		try {
-			taResult.setText(rsa.decrypt(taMessage.getText()));
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		}
-	}
+    @FXML
+    protected void btnDecryptMessageAction(ActionEvent event) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException, UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
+        if (taMessage.getText().isEmpty() || taPrivateKey.getText().isEmpty()) {
+            return;
+        }
+
+        rsa.setPrivateKey(taPrivateKey.getText());
+        taResult.setText(rsa.decrypt(taMessage.getText()));
+    }
+
+    @FXML
+    protected void btnExportPublicKey(ActionEvent event) throws IOException {
+        this.saveToFile("public.key", taPublicKey.getText());
+        Runtime.getRuntime().exec("notepad.exe public.key");
+    }
+
+    @FXML
+    protected void btnExportPrivateKey(ActionEvent event) throws IOException {
+        this.saveToFile("private.key", taPrivateKey.getText());
+        Runtime.getRuntime().exec("notepad.exe private.key");
+    }
+
+    @FXML
+    protected void btnImportPublicKey(ActionEvent event) throws IOException {
+        taPublicKey.setText(this.readFromFile("public.key", StandardCharsets.UTF_8));
+    }
+
+    @FXML
+    protected void btnImportPrivateKey(ActionEvent event) throws IOException {
+        taPrivateKey.setText(this.readFromFile("private.key", StandardCharsets.UTF_8));
+    }
+
+    @FXML
+    protected void exitApplication(ActionEvent event) {
+        System.exit(0);
+    }
+
+    private void saveToFile(String filename, String text) throws IOException {
+        FileOutputStream out = new FileOutputStream(filename);
+        out.write(text.getBytes("UTF-8"));
+        out.close();
+    }
+
+    private String readFromFile(String filename, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(filename));
+        return encoding.decode(ByteBuffer.wrap(encoded)).toString();
+    }
 }
