@@ -36,7 +36,6 @@ public class Controller {
 	public Controller() throws NoSuchPaddingException, NoSuchAlgorithmException
 	{
 		rsa = RSA.newInstance();
-		log("Keys generated! - Ready!");
 	}
 
 	@FXML
