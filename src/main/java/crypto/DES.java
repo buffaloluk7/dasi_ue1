@@ -18,7 +18,7 @@ public class DES
 		this.cipher = cipher;
 	}
 
-	public static DES newInstance( String password ) throws AESException
+	public static DES newInstance( String password ) throws DESException
 	{
 		Cipher cipher;
 		SecretKey secretKey;
@@ -32,13 +32,13 @@ public class DES
 		}
 		catch( NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | UnsupportedEncodingException e )
 		{
-			throw new AESException(e);
+			throw new DESException(e);
 		}
 
 		return new DES(secretKey, cipher);
 	}
 
-	public byte[] encrypt( byte[] plaintext ) throws AESException
+	public byte[] encrypt( byte[] plaintext ) throws DESException
 	{
 		try
 		{
@@ -47,11 +47,11 @@ public class DES
 		}
 		catch( InvalidKeyException | BadPaddingException | IllegalBlockSizeException e )
 		{
-			throw new AESException(e);
+			throw new DESException(e);
 		}
 	}
 
-	public byte[] decrypt( byte[] ciphertext ) throws AESException
+	public byte[] decrypt( byte[] ciphertext ) throws DESException
 	{
 		try
 		{
@@ -60,7 +60,7 @@ public class DES
 		}
 		catch( InvalidKeyException | BadPaddingException | IllegalBlockSizeException e )
 		{
-			throw new AESException(e);
+			throw new DESException(e);
 		}
 	}
 }

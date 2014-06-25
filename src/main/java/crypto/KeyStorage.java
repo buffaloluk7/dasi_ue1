@@ -10,13 +10,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 public class KeyStorage
 {
-	public static void writePrivateKey(String filename, PrivateKey privateKey, DES DES ) throws AESException, IOException
+	public static void writePrivateKey(String filename, PrivateKey privateKey, DES DES ) throws DESException, IOException
 	{
 		byte[] encryptedKey = DES.encrypt(privateKey.getEncoded());
 		Files.write(new File(filename).toPath(), encryptedKey, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 	}
 
-	public static PrivateKey readPrivateKey(String filename, DES DES ) throws IOException, AESException, NoSuchAlgorithmException, InvalidKeySpecException
+	public static PrivateKey readPrivateKey(String filename, DES DES ) throws IOException, DESException, NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		byte[] encryptedKey = Files.readAllBytes(new File(filename).toPath());
 		byte[] decryptedKey = DES.decrypt(encryptedKey);

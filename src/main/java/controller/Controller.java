@@ -1,6 +1,6 @@
 package controller;
 
-import crypto.AESException;
+import crypto.DESException;
 import crypto.DES;
 import crypto.KeyStorage;
 import crypto.RSA;
@@ -66,7 +66,7 @@ public class Controller {
 
 
 	@FXML
-	protected void btnExportKeys(ActionEvent event) throws IOException, AESException
+	protected void btnExportKeys(ActionEvent event) throws IOException, DESException
 	{
 		if ( tfPassword.getText().isEmpty() || tfPassword.getText().length() < 8)
 		{
@@ -80,7 +80,7 @@ public class Controller {
 	}
 
 	@FXML
-	protected void btnImportKeys(ActionEvent event) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, AESException
+	protected void btnImportKeys(ActionEvent event) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, DESException
 	{
 		if ( tfPassword.getText().isEmpty() || tfPassword.getText().length() < 8)
 		{
