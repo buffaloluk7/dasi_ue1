@@ -1,16 +1,11 @@
-package rsa;
+package crypto;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
 import java.util.Base64;
 
 public class RSA
@@ -52,33 +47,39 @@ public class RSA
 		return rsa;
 	}
 
-	public void saveToKeystore(String keystorePath, String password) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidParameterSpecException
-	{
-		FileInputStream inputStream = new FileInputStream(keystorePath);
-
-
-	}
-
 	public KeyPair getKeyPair()
 	{
 		return new KeyPair(this.publicKey, this.privateKey);
 	}
 
-	public String encrypt( String plaintext ) throws InvalidKeyException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException
+	public String encrypt( String plaintext ) throws UnsupportedEncodingException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException
+	{
+		byte[] plaintextBytes = plaintext.getBytes("UTF-8");
+		byte[] encryptedBytes = this.encrypt(plaintextBytes);
+
+		byte[] base64encoded = Base64.getEncoder().encode(encryptedBytes);
+
+		return new String(base64encoded);
+	}
+
+	public String decrypt( String ciphertext ) throws UnsupportedEncodingException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException
+	{
+		byte[] ciphertextBytes = Base64.getDecoder().decode(ciphertext.getBytes("UTF-8"));
+		byte[] decryptedBytes = this.decrypt(ciphertextBytes);
+		return new String(decryptedBytes);
+	}
+
+	public byte[] encrypt( byte[] plaintext ) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException
 	{
 		cipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
 
-		byte[] encrypted = cipher.doFinal(plaintext.getBytes("UTF-8"));
-
-		return Base64.getEncoder().encodeToString(encrypted);
+		return cipher.doFinal(plaintext);
 	}
 
-	public String decrypt( String cipherText ) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException
+	public byte[] decrypt( byte[] ciphertext ) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException
 	{
 		cipher.init(Cipher.DECRYPT_MODE, this.privateKey);
 
-		byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-
-		return new String(decrypted);
+		return cipher.doFinal(ciphertext);
 	}
 }
