@@ -17,17 +17,29 @@ public class RSA {
 		this.cipher = cipher;
 	}
 
-	public static RSA newInstance() throws NoSuchAlgorithmException, NoSuchPaddingException {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		keyPairGenerator.initialize(2048);
+	public static RSA newInstance() throws RSAException {
+		KeyPairGenerator keyPairGenerator;
+
+		try {
+			keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+			keyPairGenerator.initialize(2048);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RSAException(e);
+		}
 
 		KeyPair keypair = keyPairGenerator.generateKeyPair();
 
 		return RSA.newInstance(keypair);
 	}
 
-	public static RSA newInstance(KeyPair keypair) throws NoSuchPaddingException, NoSuchAlgorithmException {
-		Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+	public static RSA newInstance(KeyPair keypair) throws RSAException {
+		Cipher cipher;
+
+		try {
+			cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+			throw new RSAException(e);
+		}
 
 		RSA rsa = new RSA(cipher);
 		rsa.publicKey = keypair.getPublic();
@@ -40,30 +52,53 @@ public class RSA {
 		return new KeyPair(this.publicKey, this.privateKey);
 	}
 
-	public String encrypt(String plaintext) throws UnsupportedEncodingException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-		byte[] plaintextBytes = plaintext.getBytes("UTF-8");
-		byte[] encryptedBytes = this.encrypt(plaintextBytes);
+	public String encrypt(String plaintext) throws RSAException {
+		byte[] plaintextBytes;
+		byte[] encryptedBytes;
+
+		try {
+			plaintextBytes = plaintext.getBytes("UTF-8");
+			encryptedBytes = this.encrypt(plaintextBytes);
+		} catch (UnsupportedEncodingException | RSAException e) {
+			throw new RSAException(e);
+		}
 
 		byte[] base64encoded = Base64.getEncoder().encode(encryptedBytes);
 
 		return new String(base64encoded);
 	}
 
-	public String decrypt(String cipherText) throws UnsupportedEncodingException, BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
-		byte[] cipherTextBytes = Base64.getDecoder().decode(cipherText.getBytes("UTF-8"));
-		byte[] decryptedBytes = this.decrypt(cipherTextBytes);
+	public String decrypt(String cipherText) throws RSAException {
+		byte[] cipherTextBytes;
+		byte[] decryptedBytes;
+
+		try {
+			cipherTextBytes = Base64.getDecoder().decode(cipherText.getBytes("UTF-8"));
+			decryptedBytes = this.decrypt(cipherTextBytes);
+		} catch (UnsupportedEncodingException | RSAException e) {
+			throw new RSAException(e);
+		}
+
 		return new String(decryptedBytes);
 	}
 
-	public byte[] encrypt(byte[] plaintext) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-		cipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
+	public byte[] encrypt(byte[] plaintext) throws RSAException {
+		try {
+			cipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
 
-		return cipher.doFinal(plaintext);
+			return cipher.doFinal(plaintext);
+		} catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+			throw new RSAException(e);
+		}
 	}
 
-	public byte[] decrypt(byte[] cipherText) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-		cipher.init(Cipher.DECRYPT_MODE, this.privateKey);
+	public byte[] decrypt(byte[] cipherText) throws RSAException {
+		try {
+			cipher.init(Cipher.DECRYPT_MODE, this.privateKey);
 
-		return cipher.doFinal(cipherText);
+			return cipher.doFinal(cipherText);
+		} catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+			throw new RSAException(e);
+		}
 	}
 }
