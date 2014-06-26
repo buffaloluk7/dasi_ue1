@@ -42,8 +42,9 @@
                         </Menu>
                         <Menu mnemonicParsing="false" text="Keys">
                      <items>
-                        <MenuItem mnemonicParsing="false" onAction="#btnImportKeys" text="Import" />
-                        <MenuItem mnemonicParsing="false" onAction="#btnExportKeys" text="Export" />
+	                    <MenuItem mnemonicParsing="false" onAction="#btnGenerateKeys" text="Generate keys" />
+                        <MenuItem mnemonicParsing="false" onAction="#btnImportKeys" text="Import keys" />
+                        <MenuItem mnemonicParsing="false" onAction="#btnExportKeys" text="Export keys" />
                      </items></Menu>
                     </menus>
                 </MenuBar>
