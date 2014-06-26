@@ -48,10 +48,11 @@
                      </items></Menu>
                     </menus>
                 </MenuBar>
-            <TextField fx:id="tfPassword" promptText="Password" GridPane.rowIndex="1">
+            <PasswordField fx:id="tfPassword" promptText="Password" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets bottom="5.0" left="10.0" top="10.0" />
-               </GridPane.margin></TextField>
+               </GridPane.margin>
+            </PasswordField>
             <Button mnemonicParsing="false" onAction="#btnEncryptMessageAction" text="Encrypt message" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets bottom="5.0" top="10.0" />

@@ -3,9 +3,8 @@ package controller;
 import crypto.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import sun.util.logging.resources.logging_es;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class Controller {
 	@FXML
 	private TextArea taLog;
 	@FXML
-	private TextField tfPassword;
+	private PasswordField tfPassword;
 
 	private RSA rsa;
 
